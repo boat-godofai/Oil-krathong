@@ -1,0 +1,432 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>กระทงของออย</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+/* Layout: a full-bleed night river. The krathong drifts in from the left, settles at screen center,
+   and a tap opens a message card above it while the krathong sinks lower on the water. */
+:root {
+  --night-top: #080e2b;
+  --night-low: #1b2a5c;
+  --water-top: #12384d;
+  --water-deep: #051520;
+  --flame: #ffc462;
+  --flame-core: #fff6d6;
+  --petal: #f08bb0;
+  --petal-light: #fbd3e2;
+  --petal-deep: #d95f8f;
+  --leaf: #5fa65d;
+  --leaf-deep: #2f6d3e;
+  --trunk: #ecd38d;
+  --trunk-deep: #b58b43;
+  --text: #fdf1dc;
+  --text-dim: #c3bfd3;
+  --line: rgba(255, 214, 150, 0.3);
+  --font-hand: "Mali", "Sarabun", system-ui, sans-serif;
+  --font-body: "Sarabun", system-ui, sans-serif;
+  --moon: clamp(56px, 15vw, 88px);
+  --moon-right: 13%;
+  --horizon: 38%;
+  color-scheme: dark;
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--night-top);
+  color: var(--text);
+  font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- Scene ---------- */
+.sky {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 40% at 80% 12%, rgba(255, 240, 190, 0.13), transparent 70%),
+    linear-gradient(180deg, var(--night-top) 0%, var(--night-low) var(--horizon), var(--night-low) 100%);
+}
+.sky i.star {
+  position: absolute; border-radius: 50%; background: #fff;
+  opacity: 0.2; animation: twinkle 4s ease-in-out infinite;
+}
+@keyframes twinkle { 50% { opacity: 0.95; } }
+
+.moon {
+  position: fixed; top: 8%; right: var(--moon-right);
+  width: var(--moon); height: var(--moon); border-radius: 50%;
+  background: radial-gradient(circle at 38% 36%, #fffdf0 0%, #f6ebc2 55%, #e7d6a0 100%);
+  box-shadow: 0 0 40px 8px rgba(255, 240, 190, 0.28), 0 0 120px 30px rgba(255, 240, 190, 0.12);
+}
+
+.lantern {
+  position: fixed; top: var(--horizon); width: 8px; height: 11px; border-radius: 3px 3px 5px 5px;
+  background: linear-gradient(#ffe2a0, #ff9d45);
+  box-shadow: 0 0 10px 3px rgba(255, 170, 80, 0.55);
+  opacity: 0; animation: rise linear infinite;
+}
+@keyframes rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 0.6; }
+  80% { opacity: 0.4; }
+  100% { transform: translate(14px, -48vh); opacity: 0; }
+}
+
+.water {
+  position: fixed; left: 0; right: 0; bottom: 0; top: var(--horizon);
+  background: linear-gradient(180deg, var(--water-top) 0%, var(--water-deep) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.18);
+}
+.streaks {
+  position: fixed; top: var(--horizon); right: var(--moon-right); width: var(--moon);
+  display: flex; flex-direction: column; align-items: center; gap: 9px; padding-top: 10px;
+}
+.streaks i {
+  display: block; height: 2px; border-radius: 2px; background: rgba(255, 240, 190, 0.55);
+  animation: shimmer 5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-6px); opacity: 0.25; }
+  50% { transform: translateX(6px); opacity: 0.6; }
+}
+
+.caption {
+  position: fixed; left: 0; right: 0; text-align: center;
+  top: calc(env(safe-area-inset-top, 0px) + 22px);
+  font-family: var(--font-hand); font-size: 0.95rem; color: var(--text-dim);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  opacity: 0; animation: fadein 2s ease 0.8s forwards;
+}
+@keyframes fadein { to { opacity: 1; } }
+
+/* ---------- Krathong ---------- */
+.floatwrap {
+  position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none;
+}
+.drift { animation: drift 7s cubic-bezier(0.16, 0.8, 0.24, 1) both; }
+@keyframes drift { from { transform: translateX(-100vw); } to { transform: translateX(0); } }
+
+.shift { transition: transform 1.3s cubic-bezier(0.3, 0.7, 0.2, 1); }
+.open .shift { transform: translateY(30vh) scale(0.74); }
+
+.kr {
+  position: relative; display: block; padding: 0; margin: 0; border: 0; background: none;
+  cursor: pointer; pointer-events: auto; color: inherit; font: inherit;
+  animation: bob 4.8s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1.2deg); }
+}
+.kr:focus-visible { outline: 2px solid var(--flame); outline-offset: 10px; border-radius: 12px; }
+.kr svg { display: block; width: min(78vw, 360px); height: auto; overflow: visible; }
+
+.rip {
+  fill: none; stroke: rgba(210, 235, 255, 0.4); stroke-width: 1.2;
+  transform-box: fill-box; transform-origin: center; animation: ripple 4.2s ease-out infinite;
+}
+.rip.b { animation-delay: 2.1s; }
+@keyframes ripple { from { transform: scale(0.8); opacity: 0.7; } to { transform: scale(1.5); opacity: 0; } }
+
+.flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.7s ease-in-out infinite; }
+@keyframes flicker {
+  0%, 100% { transform: scale(1, 1) rotate(-1deg); }
+  30% { transform: scale(0.94, 1.08) rotate(1.5deg); }
+  60% { transform: scale(1.04, 0.96) rotate(-1.5deg); }
+}
+.glow { transform-box: fill-box; transform-origin: center; opacity: 0.75; transition: transform 1.2s ease, opacity 1.2s ease; }
+.open .glow { transform: scale(1.7); opacity: 1; }
+.ember { animation: ember 2.4s ease-in-out infinite; }
+@keyframes ember { 50% { opacity: 0.45; } }
+
+.invite {
+  fill: none; stroke: rgba(255, 214, 150, 0.55); stroke-width: 1.4; opacity: 0;
+  transform-box: fill-box; transform-origin: center;
+}
+.arrived:not(.open) .invite { animation: invite 2.6s ease-out infinite; }
+@keyframes invite { from { transform: scale(0.85); opacity: 0.8; } to { transform: scale(1.45); opacity: 0; } }
+
+.hint {
+  position: absolute; left: 50%; top: calc(100% + 14px); transform: translateX(-50%);
+  white-space: nowrap; font-family: var(--font-hand); font-size: 1.05rem; color: var(--flame);
+  opacity: 0; transition: opacity 0.8s ease; pointer-events: none;
+}
+.arrived:not(.open) .hint { opacity: 1; }
+
+/* ---------- Message card ---------- */
+.cardwrap {
+  position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 7vh);
+  display: flex; justify-content: center; pointer-events: none;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card {
+  width: 100%; max-width: 420px; max-height: 56vh; overflow-y: auto; box-sizing: border-box;
+  padding: 22px 24px 14px;
+  background: linear-gradient(180deg, rgba(24, 36, 78, 0.8), rgba(12, 20, 46, 0.86));
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), 0 0 40px rgba(255, 190, 100, 0.12);
+  opacity: 0; visibility: hidden; transform: translateY(16px);
+  transition: opacity 0.8s ease, transform 0.8s ease, visibility 0s linear 0.8s;
+}
+.open .card {
+  opacity: 1; visibility: visible; transform: none; pointer-events: auto;
+  transition-delay: 0.5s, 0.5s, 0s;
+}
+.card h1 {
+  margin: 0 0 10px; font-family: var(--font-hand); font-weight: 600; font-size: 1.8rem; line-height: 1.3;
+  color: var(--flame);
+}
+.card p {
+  margin: 0 0 10px; font-family: var(--font-hand); font-size: 1.02rem; line-height: 1.75; color: var(--text);
+  opacity: 0; transform: translateY(8px);
+}
+.card p.sign { text-align: right; color: var(--flame); margin-bottom: 4px; }
+.open .card p {
+  animation: lineup 0.9s ease forwards;
+  animation-delay: calc(var(--i) * 0.75s + 1.1s);
+}
+@keyframes lineup { to { opacity: 1; transform: none; } }
+.closebtn {
+  display: block; margin: 0 0 0 auto; padding: 8px 4px; border: 0; background: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.9rem; color: var(--text-dim);
+}
+.closebtn:hover { color: var(--text); }
+.closebtn:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- Sparks ---------- */
+.spark {
+  position: fixed; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, #fff6d6 0%, #ffc462 55%, rgba(255, 196, 98, 0) 75%);
+  animation: spark var(--d) ease-out forwards;
+}
+@keyframes spark {
+  from { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  to { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift, .kr, .flame, .ember, .rip, .invite, .sky i.star, .streaks i, .lantern { animation: none !important; }
+  .lantern { display: none; }
+  .caption { animation: none; opacity: 1; }
+  .shift, .glow, .card, .hint { transition-duration: 0.01s !important; transition-delay: 0s !important; }
+  .open .card p { animation: none; opacity: 1; transform: none; }
+}
+</style>
+
+<div class="sky" id="sky" aria-hidden="true"></div>
+<div class="moon" aria-hidden="true"></div>
+<div class="water" aria-hidden="true"></div>
+<div class="streaks" id="streaks" aria-hidden="true"></div>
+<div id="lanterns" aria-hidden="true"></div>
+
+<p class="caption">คืนวันเพ็ญ เดือนสิบสอง</p>
+
+<main id="stage">
+  <div class="floatwrap">
+    <div class="drift">
+      <div class="shift">
+        <button class="kr" id="krathong" type="button" aria-expanded="false" aria-controls="card" aria-label="แตะกระทงเพื่อเปิดข้อความจากโบ๊ท">
+          <svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="กระทงดอกบัวสีชมพู จุดเทียนและธูป ลอยอยู่บนผิวน้ำ">
+            <defs>
+              <linearGradient id="gTrunk" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f4e1a6"/><stop offset="1" stop-color="#c79a4e"/>
+              </linearGradient>
+              <linearGradient id="gSide" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#9f7634"/><stop offset="0.5" stop-color="#c79a4e"/><stop offset="1" stop-color="#9f7634"/>
+              </linearGradient>
+              <linearGradient id="gLeaf" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#2f6d3e"/><stop offset="1" stop-color="#7cc275"/>
+              </linearGradient>
+              <linearGradient id="gPetalOut" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#d95f8f"/><stop offset="1" stop-color="#f7a9c6"/>
+              </linearGradient>
+              <linearGradient id="gPetalMid" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#e885ac"/><stop offset="1" stop-color="#fbd3e2"/>
+              </linearGradient>
+              <linearGradient id="gPetalIn" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0" stop-color="#f6bdd3"/><stop offset="1" stop-color="#fff2f6"/>
+              </linearGradient>
+              <linearGradient id="gCandle" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#e9dcc2"/><stop offset="0.5" stop-color="#fff7e6"/><stop offset="1" stop-color="#d9c8a6"/>
+              </linearGradient>
+              <radialGradient id="gFlame" cx="0.5" cy="0.75" r="0.6">
+                <stop offset="0" stop-color="#fff6d6"/><stop offset="0.5" stop-color="#ffc462"/><stop offset="1" stop-color="#ff8a2a"/>
+              </radialGradient>
+              <radialGradient id="gGlow">
+                <stop offset="0" stop-color="#ffc462" stop-opacity="0.75"/>
+                <stop offset="0.45" stop-color="#ff9d45" stop-opacity="0.25"/>
+                <stop offset="1" stop-color="#ff9d45" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="gWaterGlow">
+                <stop offset="0" stop-color="#ffc462" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#ffc462" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <ellipse cx="120" cy="184" rx="100" ry="14" class="rip"/>
+            <ellipse cx="120" cy="184" rx="100" ry="14" class="rip b"/>
+            <ellipse cx="120" cy="184" rx="104" ry="16" class="invite"/>
+            <ellipse cx="120" cy="186" rx="118" ry="22" fill="url(#gWaterGlow)"/>
+
+            <!-- banana trunk base -->
+            <ellipse cx="120" cy="166" rx="96" ry="26" fill="#9f7634"/>
+            <rect x="24" y="150" width="192" height="16" fill="url(#gSide)"/>
+            <ellipse cx="120" cy="150" rx="96" ry="26" fill="url(#gTrunk)"/>
+
+            <g id="layers"></g>
+
+            <!-- flame -->
+            <circle class="glow" cx="120" cy="60" r="30" fill="url(#gGlow)"/>
+            <g class="flame">
+              <path d="M120 44 C127 54 129 62 120 69 C111 62 113 54 120 44 Z" fill="url(#gFlame)"/>
+            </g>
+            <circle cx="92" cy="52" r="1.8" fill="#ff5a3c" class="ember"/>
+            <circle cx="150" cy="50" r="1.8" fill="#ff5a3c" class="ember" style="animation-delay:-1.1s"/>
+          </svg>
+          <span class="hint">แตะกระทงเบา ๆ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cardwrap">
+    <section class="card" id="card" role="region" aria-label="ข้อความจากโบ๊ท ถึงออย">
+      <h1>ถึง ออย</h1>
+      <p style="--i:0">ขอบคุณนะที่เข้ามาเป็นเรื่องราวดีๆ ในชีวิตของโบ๊ท</p>
+      <p style="--i:1">โบ๊ทดีใจมากที่มีออยอยู่ข้างๆ</p>
+      <p style="--i:2">ลอยกระทงปีนี้เราอาจจะไม่ค่อยได้อยู่ด้วยกัน แต่โบ๊ทก็มีความสุขมากๆ และอยากให้ออยมีความสุขมากๆ เหมือนกัน</p>
+      <p style="--i:3">ขอให้ทุกอย่างที่ออยตั้งใจประสบความสำเร็จได้ด้วยดี เป็นที่รักของคนรอบข้าง และมีความสุขกับชีวิตมากๆ</p>
+      <p style="--i:4">สุขสันต์วันลอยกระทงครับ</p>
+      <p class="sign" style="--i:5">จาก โบ๊ท</p>
+      <button class="closebtn" id="closebtn" type="button">ปิด</button>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var btn = document.getElementById('krathong');
+  var closeBtn = document.getElementById('closebtn');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var svgNS = 'http://www.w3.org/2000/svg';
+
+  /* ----- build the lotus layers ----- */
+  var PETAL = 'M0 0 C-9 -10 -9 -26 0 -40 C9 -26 9 -10 0 0 Z';
+  var LEAF = 'M0 0 C-7 -8 -6 -24 0 -40 C6 -24 7 -8 0 0 Z';
+
+  function ring(o) {
+    var items = [];
+    for (var i = 0; i < o.n; i++) {
+      var t = (o.start || 0) + (i / o.n) * Math.PI * 2;
+      items.push({ t: t, x: 120 + o.R * Math.cos(t), y: o.cy + o.r * Math.sin(t) });
+    }
+    items.sort(function (a, b) { return Math.sin(a.t) - Math.sin(b.t); });
+    if (o.part === 'back') items = items.filter(function (p) { return Math.sin(p.t) < 0; });
+    if (o.part === 'front') items = items.filter(function (p) { return Math.sin(p.t) >= 0; });
+    return items.map(function (p) {
+      var a = Math.cos(p.t) * o.lean;
+      var s = o.len / 40;
+      return '<path d="' + o.d + '" transform="translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) +
+        ') rotate(' + a.toFixed(1) + ') scale(' + (s * o.wid).toFixed(2) + ' ' + s.toFixed(2) +
+        ')" fill="' + o.fill + '" stroke="' + o.stroke + '" stroke-width="0.7"/>';
+    }).join('');
+  }
+
+  var leaves = ring({ n: 20, R: 88, r: 22, cy: 148, len: 36, wid: 1, lean: 62, d: LEAF, fill: 'url(#gLeaf)', stroke: 'rgba(20,60,30,.35)' });
+  var outer = ring({ n: 14, R: 74, r: 19, cy: 146, len: 46, wid: 1.05, lean: 38, start: 0.2, d: PETAL, fill: 'url(#gPetalOut)', stroke: 'rgba(150,40,90,.3)' });
+  var mid = ring({ n: 11, R: 52, r: 14, cy: 137, len: 40, wid: 1, lean: 30, start: 0.5, d: PETAL, fill: 'url(#gPetalMid)', stroke: 'rgba(170,60,110,.28)' });
+  var innerOpts = { n: 8, R: 30, r: 8, cy: 128, len: 32, wid: 0.95, lean: 22, start: 0.1, d: PETAL, fill: 'url(#gPetalIn)', stroke: 'rgba(190,90,130,.25)' };
+  innerOpts.part = 'back';
+  var innerBack = ring(innerOpts);
+  innerOpts.part = 'front';
+  var innerFront = ring(innerOpts);
+
+  var sticks =
+    '<line x1="112" y1="122" x2="92" y2="52" stroke="#7a4b2b" stroke-width="1.7" stroke-linecap="round"/>' +
+    '<line x1="128" y1="122" x2="150" y2="50" stroke="#7a4b2b" stroke-width="1.7" stroke-linecap="round"/>';
+  var candle =
+    '<ellipse cx="120" cy="120" rx="11" ry="3.5" fill="rgba(0,0,0,.18)"/>' +
+    '<rect x="113" y="70" width="14" height="50" fill="url(#gCandle)"/>' +
+    '<ellipse cx="120" cy="70" rx="7" ry="2.4" fill="#fff7e6"/>' +
+    '<line x1="120" y1="70" x2="120" y2="65" stroke="#4a3626" stroke-width="1.2" stroke-linecap="round"/>';
+
+  document.getElementById('layers').innerHTML = leaves + outer + mid + innerBack + sticks + candle + innerFront;
+
+  /* ----- scenery ----- */
+  var sky = document.getElementById('sky');
+  for (var i = 0; i < 80; i++) {
+    var s = document.createElement('i');
+    s.className = 'star';
+    var size = 1 + Math.random() * 1.6;
+    s.style.cssText = 'left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (Math.random() * 37).toFixed(1) +
+      '%;width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;animation-delay:-' + (Math.random() * 4).toFixed(1) +
+      's;animation-duration:' + (3 + Math.random() * 3).toFixed(1) + 's';
+    sky.appendChild(s);
+  }
+
+  var streaks = document.getElementById('streaks');
+  var widths = [0.95, 0.7, 0.85, 0.5, 0.7, 0.4, 0.55, 0.3, 0.4];
+  widths.forEach(function (w, k) {
+    var b = document.createElement('i');
+    b.style.width = (w * 100).toFixed(0) + '%';
+    b.style.animationDelay = '-' + (k * 0.6).toFixed(1) + 's';
+    streaks.appendChild(b);
+  });
+
+  var lanterns = document.getElementById('lanterns');
+  for (var j = 0; j < 7; j++) {
+    var l = document.createElement('i');
+    l.className = 'lantern';
+    var dur = 24 + Math.random() * 16;
+    l.style.cssText = 'left:' + (8 + Math.random() * 70).toFixed(0) + '%;animation-duration:' + dur.toFixed(0) +
+      's;animation-delay:-' + (Math.random() * dur).toFixed(0) + 's';
+    lanterns.appendChild(l);
+  }
+
+  /* ----- behavior ----- */
+  function arrive() { stage.classList.add('arrived'); }
+  var drift = document.querySelector('.drift');
+  if (reduce) {
+    arrive();
+  } else {
+    drift.addEventListener('animationend', function (e) { if (e.animationName === 'drift') arrive(); });
+    setTimeout(arrive, 7500);
+  }
+
+  function burst() {
+    if (reduce) return;
+    var r = btn.getBoundingClientRect();
+    var cx = r.left + r.width / 2;
+    var cy = r.top + r.height * 0.3;
+    for (var n = 0; n < 26; n++) {
+      var sp = document.createElement('span');
+      sp.className = 'spark';
+      var size = 3 + Math.random() * 5;
+      sp.style.cssText = 'left:' + (cx - size / 2).toFixed(0) + 'px;top:' + (cy - size / 2).toFixed(0) +
+        'px;width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;--dx:' + ((Math.random() - 0.5) * 220).toFixed(0) +
+        'px;--dy:-' + (110 + Math.random() * 190).toFixed(0) + 'px;--d:' + (1.8 + Math.random() * 1.4).toFixed(1) + 's';
+      sp.addEventListener('animationend', function () { this.remove(); });
+      document.body.appendChild(sp);
+    }
+  }
+
+  function setOpen(v) {
+    stage.classList.toggle('open', v);
+    btn.setAttribute('aria-expanded', v ? 'true' : 'false');
+    if (v) burst();
+  }
+
+  btn.addEventListener('click', function () { setOpen(!stage.classList.contains('open')); });
+  closeBtn.addEventListener('click', function () { setOpen(false); btn.focus(); });
+})();
+</script>
+
+</body></html>
